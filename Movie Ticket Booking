@@ -1,0 +1,129 @@
+import java.util.Scanner;
+import java.util.Map;
+import java.util.LinkedHashMap;
+
+public class temp {
+
+    private static LinkedHashMap<String, Boolean> seats = new LinkedHashMap<>();
+
+    static {
+        initializeSeats();
+    }
+
+    public static void main(String[] args) {
+        while (true) {
+            System.out.println("What would you like to do?");
+            System.out.println("1. Book your tickets");
+            System.out.println("2. Cancel your tickets");
+            System.out.println("3. Seat status");
+            System.out.println("4. Exit");
+
+            System.out.print("Enter your choice (1-4): ");
+            Scanner vin = new Scanner(System.in);
+            String choice = vin.nextLine();
+
+            switch (choice) {
+                case "1":
+                    bookTicket();
+                    break;
+                case "2":
+                    cancelTicket();
+                    break;
+                case "3":
+                    printSeats();
+                    break;
+                case "4":
+                    System.out.println("Thank you!!");
+                    System.out.println("Visit again\n");
+                    System.exit(0);
+                default:
+                    System.out.println("Invalid choice. Please try again.\n");
+            }
+        }
+    }
+
+    private static void initializeSeats() {
+        char row;
+ 
+
+
+        for (int i = 1; i <= 5; i++) {
+            row = (char) ('A' + i - 1);
+            for (int j = 1; j <= 10; j++) {
+                seats.put(row + "" + j, false);
+            }
+        }
+    }
+
+    private static void printSeats() {
+        System.out.println("Current seat status:");
+        for (Map.Entry<String, Boolean> entry : seats.entrySet()) {
+            String seat = entry.getKey();
+            boolean isBooked = entry.getValue();
+            String status = isBooked ? "\u001B[31m" + seat + "\u001B[0m" : "\u001B[32m" + seat + "\u001B[0m";
+            System.out.print("|" + status + "|" + " ");
+            if (seat.endsWith("10")) {
+                System.out.println();
+                System.out.println("-".repeat(50));
+            }
+        }
+        System.out.println();
+    }
+
+    private static void bookTicket() {
+        Scanner vin = new Scanner(System.in);
+
+        System.out.print("How many tickets do you want to book? ");
+        int numTickets = vin.nextInt();
+        vin.nextLine();
+        for (int i = 1; i <= numTickets; i++) {
+            System.out.print("Enter seat number for ticket " + i + " (e.g., A1): ");
+            String seat = vin.nextLine();
+
+            if (!seats.containsKey(seat)) {
+                System.out.println("Invalid seat number. Please try again.\n");
+                return;
+            }
+
+            if (seats.get(seat)) {
+                System.out.println("Sorry, that seat is already booked. Please choose another seat.\n");
+                return;
+            }
+
+            seats.put(seat, true);
+        }
+
+        System.out.println("Tickets have been booked.");
+        System.out.println("Cost of your tickets is: Rs." + numTickets * 100 + "\n");
+    }
+
+    private static void cancelTicket() {
+        Scanner vin = new Scanner(System.in);
+
+        System.out.print("Enter seat numbers to cancel (e.g., A1 B2 C3): ");
+        String[] seatNumbers = vin.nextLine().split(" ");
+
+        boolean cancelled = false;
+
+        for (String seat : seatNumbers) {
+            if (!seats.containsKey(seat)) {
+                System.out.println("Invalid seat number " + seat + ". Please try again.");
+                continue;
+            }
+
+            if (!seats.get(seat)) {
+                System.out.println("Seat " + seat + " is not booked.");
+                continue;
+            }
+
+            seats.put(seat, false);
+            System.out.println("Booking for seat " + seat + " has been cancelled.");
+            System.out.println(
+                    "Amount responsible for cancelled tickets i.e Rs. 100 has been returned to your bank account\n");
+            cancelled = true;
+        }
+
+        if (!cancelled) {
+            System.out.println("No bookings were cancelled.\n");
+        }
+    }
